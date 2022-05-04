@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from urllib import response
+from views import get_all_tags, get_single_tag
 
 from views.user import create_user, login_user
 
@@ -7,9 +9,9 @@ from views.user import create_user, login_user
 class HandleRequests(BaseHTTPRequestHandler):
     """Handles the requests to this server"""
 
-    def parse_url(self):
+    def parse_url(self, path):
         """Parse the url into the resource and id"""
-        path_params = self.path.split('/')
+        path_params = path.split('/')
         resource = path_params[1]
         if '?' in resource:
             param = resource.split('?')[1]
@@ -50,8 +52,20 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        """Handle Get requests to the server"""
-        pass
+        self._set_headers(200)
+        response = {}
+        parsed = self.parse_url(self.path)
+        
+        if len(parsed) ==2:
+            ( resource, id ) = parsed
+            
+            if resource == "tags":
+                if id is not None:
+                    response = f"{get_single_tag(id)}"
+                else:
+                    response = f"{get_all_tags()}"
+                    
+        self.wfile.write(response.encode())
 
 
     def do_POST(self):

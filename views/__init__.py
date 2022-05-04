@@ -1,0 +1,1 @@
+from .tag_requests import get_single_tag, get_all_tags
