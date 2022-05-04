@@ -4,6 +4,7 @@ from urllib import response
 from views import get_all_tags, get_single_tag
 
 from views.user import create_user, login_user
+from views import get_all_posts, get_single_post, create_post
 
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -65,6 +66,13 @@ class HandleRequests(BaseHTTPRequestHandler):
                 else:
                     response = f"{get_all_tags()}"
                     
+
+            if resource == "posts":
+                if id is not None:
+                    response = f"{get_single_post(id)}"
+                else:
+                    response = f"{get_all_posts()}"
+
         self.wfile.write(response.encode())
 
 
@@ -74,14 +82,21 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = json.loads(self.rfile.read(content_len))
         response = ''
-        resource, _ = self.parse_url()
+        (resource, id) = self.parse_url(self.path)
 
         if resource == 'login':
             response = login_user(post_body)
         if resource == 'register':
             response = create_user(post_body)
-
+            
         self.wfile.write(response.encode())
+            
+        new_post = None
+         
+        if resource == "posts":
+            new_post = create_post(post_body)
+        
+            self.wfile.write(f"{new_post}".encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server"""
