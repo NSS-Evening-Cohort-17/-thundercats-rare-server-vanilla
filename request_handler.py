@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-# from views import create_user, login_user
-from views import get_all_posts, get_single_post, create_post, delete_post
+from views import create_user, login_user
+from views import get_all_posts, get_single_post, create_post, delete_post, update_post
 from views import get_all_categories, get_single_category, update_category, delete_category
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -69,12 +69,6 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_single_post(id)}"
                 else:
                     response = f"{get_all_posts()}"
-
-        self.wfile.write(response.encode())
-
-        response = {}
-
-        parsed = self.parse_url(self.path)
         
         if len(parsed) == 2:
             ( resource, id ) = parsed
@@ -93,25 +87,18 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = json.loads(self.rfile.read(content_len))
         response = ''
-        
-        (resource, id) = self.parse_url(post_body)
 
         (resource, id) = self.parse_url(self.path)
-
 
         if resource == 'login':
             response = login_user(post_body)
         if resource == 'register':
             response = create_user(post_body)
-            
-        self.wfile.write(response.encode())
-            
-        new_post = None
          
         if resource == "posts":
-            new_post = create_post(post_body)
+            response = create_post(post_body)
         
-            self.wfile.write(f"{new_post}".encode())
+        self.wfile.write(f"{response}".encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server"""
@@ -119,14 +106,15 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 
-        # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
         success = False
 
-        # Delete a single animal from the list
         if resource == "categories":
             success = update_category(id, post_body)
+        
+        elif resource == "posts":
+            success = update_post(id, post_body)
 
         if success:
             self._set_headers(204)
