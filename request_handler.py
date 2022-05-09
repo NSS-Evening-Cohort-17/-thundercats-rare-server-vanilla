@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-# from views import create_user, login_user
+from views import get_all_users, get_single_user, get_all_comments, get_single_comment, create_comment
+from views import create_user, login_user
 from views import get_all_posts, get_single_post, create_post, delete_post
 from views import get_all_categories, get_single_category, update_category, delete_category
 
@@ -69,6 +70,17 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_single_post(id)}"
                 else:
                     response = f"{get_all_posts()}"
+            elif resource == "users":
+                if id is not None:
+                    response = f"{get_single_user(id)}"
+                else:
+                    response = f"{get_all_users()}"
+            elif resource == "comments":
+                if id is not None:
+                    response = f"{get_single_comment(id)}"
+                else:
+                    response = f"{get_all_comments()}"
+                
 
         self.wfile.write(response.encode())
 
@@ -107,9 +119,15 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write(response.encode())
             
         new_post = None
+        new_user = None
+        new_comment = None
          
         if resource == "posts":
             new_post = create_post(post_body)
+        if resource == "users":
+            new_user = create_user(post_body)
+        if resource == "comments":
+            new_comment = create_comment(post_body)
         
             self.wfile.write(f"{new_post}".encode())
 
