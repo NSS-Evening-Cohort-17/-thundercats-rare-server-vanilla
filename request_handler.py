@@ -1,7 +1,8 @@
+from hashlib import new
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib import response
-from views import get_all_tags, get_single_tag
+from views import get_all_tags, get_single_tag, create_tag
 
 from views.user import create_user, login_user
 from views import get_all_posts, get_single_post, create_post
@@ -97,6 +98,13 @@ class HandleRequests(BaseHTTPRequestHandler):
             new_post = create_post(post_body)
         
             self.wfile.write(f"{new_post}".encode())
+            
+        new_tag = None
+        
+        if resource == "tags":
+            new_tag = create_tag(post_body)
+            
+            self.wfile.write(f"{new_tag}".encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server"""
