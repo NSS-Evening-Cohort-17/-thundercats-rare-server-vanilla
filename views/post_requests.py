@@ -1,7 +1,7 @@
 from datetime import datetime
 import sqlite3
 import json
-from models.post import Post
+from models import Post
         
 def get_all_posts():
   
@@ -19,8 +19,12 @@ def get_all_posts():
             p.publication_date,
             p.image_url,
             p.content,
-            p.approved
+            p.approved,
+            u.username username,
+            u.profile_image_url user_image
         FROM Posts p
+        JOIN Users u
+            ON u.id = p.user_id
         """)
 
         posts = []
@@ -31,8 +35,53 @@ def get_all_posts():
             post = Post(row['id'], row['user_id'], row['category_id'], row['title'],
                         row['publication_date'], row['image_url'], row['content'],
                         row['approved'])
+            
+            post_dict = post.__dict__
+            post_dict['username'] = row['username']
+            post_dict['user_image'] = row['user_image']
 
-            posts.append(post.__dict__)
+            posts.append(post_dict)
+
+    return json.dumps(posts)
+
+def get_posts_by_user(id):
+
+    with sqlite3.connect("./db.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        SELECT
+            p.id,
+            p.user_id,
+            p.category_id,
+            p.title,
+            p.publication_date,
+            p.image_url,
+            p.content,
+            p.approved,
+            u.username username,
+            u.profile_image_url user_image
+        FROM Posts p
+        JOIN Users u
+            ON u.id = p.user_id
+        WHERE p.user_id = ?
+        """, ( id, ))
+
+        posts = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset:
+
+            post = Post(row['id'], row['user_id'], row['category_id'], row['title'],
+                        row['publication_date'], row['image_url'], row['content'],
+                        row['approved'])
+            
+            post_dict = post.__dict__
+            post_dict['username'] = row['username']
+            post_dict['user_image'] = row['user_image']
+
+            posts.append(post_dict)
 
     return json.dumps(posts)
 
@@ -61,6 +110,7 @@ def get_single_post(id):
                     data['content'], True)
 
         return json.dumps(post.__dict__)
+    
     
 def create_post(new_post):
     with sqlite3.connect("./db.sqlite3") as conn:

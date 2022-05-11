@@ -1,3 +1,3 @@
-from .post_requests import delete_post, get_all_posts, get_single_post, create_post, delete_post, update_post
+from .post_requests import delete_post, get_all_posts, get_single_post, get_posts_by_user, create_post, delete_post, update_post
 from .category_requests import get_all_categories, get_single_category, update_category, delete_category
 from .user import login_user, create_user
