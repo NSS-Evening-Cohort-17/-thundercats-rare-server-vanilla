@@ -2,11 +2,11 @@ from hashlib import new
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib import response
+from views import create_user, login_user
+from views import get_all_posts, get_single_post, get_posts_by_user, create_post, delete_post, update_post
 from views import get_all_tags, get_single_tag, create_tag
 from views import get_all_categories, get_single_category, update_category, delete_category, create_category
 from views import get_all_users, get_single_user, get_all_comments, get_single_comment, create_comment, delete_comment
-from views import create_user, login_user
-from views import get_all_posts, get_single_post, create_post, delete_post
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Handles the requests to this server"""
@@ -93,6 +93,12 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_single_category(id)}"
                 else:
                     response = f"{get_all_categories()}"
+                    
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
+
+            if key == "user" and resource == "posts":
+                response = get_posts_by_user(value)
                 
 
         self.wfile.write(response.encode())
@@ -103,7 +109,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = json.loads(self.rfile.read(content_len))
         response = ''
-        
+
         (resource, id) = self.parse_url(self.path)
 
         if resource == 'login':
@@ -123,8 +129,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "comments":
             response = create_comment(post_body)
         
-            self.wfile.write(f"{new_post}".encode())
-        
         if resource == "tags":
             response = create_tag(post_body)
             
@@ -136,14 +140,15 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 
-        # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
         success = False
 
-        # Delete a single animal from the list
         if resource == "categories":
             success = update_category(id, post_body)
+        
+        elif resource == "posts":
+            success = update_post(id, post_body)
 
         if success:
             self._set_headers(204)
