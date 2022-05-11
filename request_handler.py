@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from views.user import create_user, login_user
-from views import get_all_categories, get_single_category, update_category, delete_category
+from views import get_all_categories, get_single_category, update_category, delete_category, create_category
 from views import get_all_posts, get_single_post, create_post
 
 
@@ -71,15 +71,6 @@ class HandleRequests(BaseHTTPRequestHandler):
                 else:
                     response = f"{get_all_posts()}"
 
-        self.wfile.write(response.encode())
-
-        response = {}
-
-        parsed = self.parse_url(self.path)
-        
-        if len(parsed) == 2:
-            ( resource, id ) = parsed
-
             if resource == "categories":
                 if id is not None:
                     response = f"{get_single_category(id)}"
@@ -94,25 +85,23 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = json.loads(self.rfile.read(content_len))
         response = ''
+
+        # (resource, id) = self.parse_url(post_body)
         
-        (resource, id) = self.parse_url(post_body)
-
         (resource, id) = self.parse_url(self.path)
-
 
         if resource == 'login':
             response = login_user(post_body)
         if resource == 'register':
             response = create_user(post_body)
-            
-        self.wfile.write(response.encode())
-            
-        new_post = None
-         
+
         if resource == "posts":
-            new_post = create_post(post_body)
-        
-            self.wfile.write(f"{new_post}".encode())
+            response = create_post(post_body)
+
+        if resource == "categories":
+            response = create_category(post_body)
+
+        self.wfile.write(f"{response}".encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server"""
