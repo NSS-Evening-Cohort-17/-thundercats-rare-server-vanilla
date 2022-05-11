@@ -98,3 +98,6 @@ INSERT INTO Comments (id, author_id, post_id, content) VALUES (4, 4, 4, 'Quisque
 Phasellus in felis. Donec semper sapien a libero. Nam dui.
 Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.');
 INSERT INTO Comments (id, author_id, post_id, content) VALUES (5, 5, 5, 'Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat.');
+
+SELECT *
+FROM Categories 
