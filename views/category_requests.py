@@ -95,6 +95,6 @@ def delete_category(id):
         db_cursor = conn.cursor()
 
         db_cursor.execute("""
-        DELETE FROM category
+        DELETE FROM Categories
         WHERE id = ?
         """, (id, ))
