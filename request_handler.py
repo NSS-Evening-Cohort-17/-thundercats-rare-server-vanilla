@@ -1,5 +1,8 @@
+from hashlib import new
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from urllib import response
+from views import get_all_tags, get_single_tag, create_tag
 from views import get_all_categories, get_single_category, update_category, delete_category, create_category
 from views import get_all_users, get_single_user, get_all_comments, get_single_comment, create_comment, delete_comment
 from views import create_user, login_user
@@ -57,13 +60,18 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_GET(self):
         """Handle Get requests to the server"""
         self._set_headers(200)
-
         response = {}
-
         parsed = self.parse_url(self.path)
-
-        if len(parsed) == 2:
+        
+        if len(parsed) ==2:
             ( resource, id ) = parsed
+            
+            if resource == "tags":
+                if id is not None:
+                    response = f"{get_single_tag(id)}"
+                else:
+                    response = f"{get_all_tags()}"
+                    
 
             if resource == "posts":
                 if id is not None:
@@ -115,6 +123,11 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "comments":
             response = create_comment(post_body)
         
+            self.wfile.write(f"{new_post}".encode())
+        
+        if resource == "tags":
+            response = create_tag(post_body)
+            
         self.wfile.write(response.encode())
 
     def do_PUT(self):
