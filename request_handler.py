@@ -4,7 +4,7 @@ import json
 from urllib import response
 from views import create_user, login_user
 from views import get_all_posts, get_single_post, get_posts_by_user, create_post, delete_post, update_post
-from views import get_all_tags, get_single_tag, create_tag
+from views import get_all_tags, get_single_tag, create_tag, delete_tag, update_tag
 from views import get_all_categories, get_single_category, update_category, delete_category, create_category
 from views import get_all_users, get_single_user, get_all_comments, get_single_comment, create_comment, delete_comment
 
@@ -149,6 +149,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         
         elif resource == "posts":
             success = update_post(id, post_body)
+            
+        elif resource == "tags":
+            success = update_tag(id, post_body)
 
         if success:
             self._set_headers(204)
@@ -171,6 +174,8 @@ class HandleRequests(BaseHTTPRequestHandler):
             delete_category(id)
         if resource == "comments":
             delete_comment(id)
+        if resource == "tags":
+            delete_tag(id)
 
         self.wfile.write("".encode())
 
