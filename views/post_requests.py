@@ -25,6 +25,7 @@ def get_all_posts():
         FROM Posts p
         JOIN Users u
             ON u.id = p.user_id
+        ORDER BY p.publication_date DESC
         """)
 
         posts = []
@@ -66,6 +67,7 @@ def get_posts_by_user(id):
         JOIN Users u
             ON u.id = p.user_id
         WHERE p.user_id = ?
+        ORDER BY p.publication_date DESC
         """, ( id, ))
 
         posts = []
@@ -99,15 +101,23 @@ def get_single_post(id):
             p.publication_date,
             p.image_url,
             p.content,
-            p.approved
+            p.approved,
+            c.label category_label
         FROM Posts p
+        JOIN Categories c
+            ON p.category_id = c.id
+        WHERE p.id = ?
         """, ( id, ))
-
+        
+        post = {}
         data = db_cursor.fetchone()
 
         post = Post(data['id'], data['user_id'], data['category_id'],
                     data['publication_date'], data['title'], data['image_url'],
                     data['content'], True)
+        
+        post_dict = post.__dict__
+        post_dict['category_label'] = data['category_label']
 
         return json.dumps(post.__dict__)
     
