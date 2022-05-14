@@ -40,7 +40,6 @@ def get_single_category(id):
             c.id,
             c.label
         FROM Categories c
-        ORDER BY label ASC
         WHERE c.id = ?
         """, (id, ))
 
@@ -74,7 +73,7 @@ def update_category(id, new_category):
         db_cursor = conn.cursor()
 
         db_cursor.execute("""
-        UPDATE Category
+        UPDATE Categories
             SET
                 label = ?
         WHERE id = ?
