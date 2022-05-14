@@ -123,7 +123,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "comments":
             response = create_comment(post_body)
         
-            self.wfile.write(f"{new_post}".encode())
+            # self.wfile.write(f"{new_post}".encode())
         
         if resource == "tags":
             response = create_tag(post_body)
